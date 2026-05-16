@@ -18,20 +18,20 @@ Para ejecutar y compilar los programas de este laboratorio, se requiere:
 Siga estas instrucciones en el entorno DOSBox:
 
 1.  **Compilación:** Genere los archivos ejecutables `.COM` desde el código fuente `.ASM`:
-    *   `nasm -f bin ISR_KB.ASM -o ISR_KB.COM`.
-    *   `nasm -f bin MASK_KB.ASM -o MASK_KB.COM`.
-    *   `nasm -f bin ISR_CHAIN.ASM -o ISR_CHAIN.COM`.
-2.  **Ejecución:** Simplemente escriba el nombre del ejecutable deseado en la línea de comandos (ej. `ISR_KB.COM`).
-3.  **Interacción:** En `ISR_KB`, presione cualquier tecla 5 veces para ver la detección y la finalización del programa. En `MASK_KB`, observe cómo el teclado deja de responder durante aproximadamente 3 segundos.
+    *   `nasm -f bin isrkb.asm -o isrkb.com`.
+    *   `nasm -f bin maskkb.asm -o maskkb.com`.
+    *   `nasm -f bin isrchain.asm -o isrchain.com`.
+2.  **Ejecución:** Simplemente escriba el nombre del ejecutable deseado en la línea de comandos (ej. `isrkb.com`).
+3.  **Interacción:** En `isrkb`, presione cualquier tecla 5 veces para ver la detección y la finalización del programa. En `maskkb`, observe cómo el teclado deja de responder durante aproximadamente 3 segundos.
 
 ---
 
 ## Explicación Técnica
 
 ### 1. Funcionamiento de cada ISR
-*   **ISR_KB.ASM:** Este programa reemplaza totalmente el manejador de la `INT 09h`. Al detectar una pulsación (IRQ1), la ISR guarda los registros, lee y descarta el *scancode* del puerto `60h`, incrementa un contador interno y envía la señal **EOI (End Of Interrupt)** al puerto `20h` para avisar al PIC que la interrupción ha sido atendida.
-*   **MASK_KB.ASM:** No modifica el vector de interrupción, sino el **IMR (Interrupt Mask Register)** del PIC maestro en el puerto `21h`. Coloca en `1` el bit correspondiente al IRQ1 para deshabilitar las interrupciones del teclado, espera un retardo usando la `INT 1Ah` del BIOS y luego restaura el valor original del IMR para habilitar el teclado nuevamente.
-*   **ISR_CHAIN.ASM:** Es una variante de la ISR personalizada que, tras ejecutar su código (como registrar la pulsación), utiliza la técnica de encadenamiento para pasar el control al manejador original del sistema.
+*   **ISRKB.ASM:** Este programa reemplaza totalmente el manejador de la `INT 09h`. Al detectar una pulsación (IRQ1), la ISR guarda los registros, lee y descarta el *scancode* del puerto `60h`, incrementa un contador interno y envía la señal **EOI (End Of Interrupt)** al puerto `20h` para avisar al PIC que la interrupción ha sido atendida.
+*   **MASKKB.ASM:** No modifica el vector de interrupción, sino el **IMR (Interrupt Mask Register)** del PIC maestro en el puerto `21h`. Coloca en `1` el bit correspondiente al IRQ1 para deshabilitar las interrupciones del teclado, espera un retardo usando la `INT 1Ah` del BIOS y luego restaura el valor original del IMR para habilitar el teclado nuevamente.
+*   **ISRCHAIN.ASM:** Es una variante de la ISR personalizada que, tras ejecutar su código (como registrar la pulsación), utiliza la técnica de encadenamiento para pasar el control al manejador original del sistema.
 
 ### 2. Instalación y Restauración del Vector
 La manipulación de la Tabla de Vectores de Interrupción (IVT) se realiza mediante servicios de la **INT 21h**:
